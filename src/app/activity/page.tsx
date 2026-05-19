@@ -70,13 +70,13 @@ export default async function ActivityPage() {
                     {fmtUsd(col.volume_24h?.usd)}
                   </td>
                   <td className="px-3 py-3 text-right hidden md:table-cell">
-                    <Chg v={col.volume_24h_percentage_change} />
+                    <Chg v={col.volume_in_usd_24h_percentage_change} />
                   </td>
                   <td className="px-3 py-3 text-right text-sm font-mono hidden lg:table-cell">
                     {fmtEth(col.floor_price?.native_currency, 3)}
                   </td>
                   <td className="px-3 py-3 text-right hidden lg:table-cell">
-                    <Chg v={col.floor_price_24h_percentage_change} />
+                    <Chg v={col.floor_price_in_usd_24h_percentage_change} />
                   </td>
                   <td className="px-3 py-3 text-center hidden xl:table-cell">
                     <a

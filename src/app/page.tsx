@@ -43,7 +43,7 @@ function CollectionCard({ col, rank }: { col: Collection; rank: number }) {
             <p className="font-mono font-medium">{fmtUsd(col.volume_24h?.usd)}</p>
           </div>
         </div>
-        <Chg v={col.floor_price_24h_percentage_change} />
+        <Chg v={col.floor_price_in_usd_24h_percentage_change} />
       </div>
     </Link>
   )
@@ -97,7 +97,7 @@ async function HeroCard({ col }: { col: Collection }) {
             <div className="text-right">
               <p className="text-xs text-[#71717a]">24h vol</p>
               <p className="font-bold text-lg">{fmtUsd(col.volume_24h?.usd)}</p>
-              <Chg v={col.volume_24h_percentage_change} />
+              <Chg v={col.volume_in_usd_24h_percentage_change} />
             </div>
           </div>
         </div>
@@ -133,7 +133,7 @@ async function TrendingSection() {
 
 async function TopGainersLosers() {
   const cols = await getTrendingCollections(20)
-  const sorted = [...cols].sort((a, b) => (b.floor_price_24h_percentage_change ?? 0) - (a.floor_price_24h_percentage_change ?? 0))
+  const sorted = [...cols].sort((a, b) => (b.floor_price_in_usd_24h_percentage_change ?? 0) - (a.floor_price_in_usd_24h_percentage_change ?? 0))
   const gainers = sorted.slice(0, 5)
   const losers = [...sorted].reverse().slice(0, 5)
 
@@ -153,7 +153,7 @@ async function TopGainersLosers() {
                   <p className="text-xs font-medium truncate">{c.name}</p>
                   <p className="text-[10px] text-[#71717a] font-mono">{fmtEth(c.floor_price?.native_currency, 2)}</p>
                 </div>
-                <Chg v={c.floor_price_24h_percentage_change} />
+                <Chg v={c.floor_price_in_usd_24h_percentage_change} />
               </div>
             </Link>
           ))}
@@ -174,7 +174,7 @@ async function TopGainersLosers() {
                   <p className="text-xs font-medium truncate">{c.name}</p>
                   <p className="text-[10px] text-[#71717a] font-mono">{fmtEth(c.floor_price?.native_currency, 2)}</p>
                 </div>
-                <Chg v={c.floor_price_24h_percentage_change} />
+                <Chg v={c.floor_price_in_usd_24h_percentage_change} />
               </div>
             </Link>
           ))}

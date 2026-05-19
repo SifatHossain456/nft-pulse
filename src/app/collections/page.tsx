@@ -70,7 +70,7 @@ export default async function CollectionsPage() {
                       <p className="text-[10px] text-[#71717a]">{fmtUsd(col.floor_price?.usd)}</p>
                     </td>
                     <td className="px-3 py-3 text-right">
-                      <Chg v={col.floor_price_24h_percentage_change} />
+                      <Chg v={col.floor_price_in_usd_24h_percentage_change} />
                     </td>
                     <td className="px-3 py-3 text-right text-sm text-[#a1a1aa] hidden md:table-cell font-mono">
                       {fmtUsd(col.volume_24h?.usd)}

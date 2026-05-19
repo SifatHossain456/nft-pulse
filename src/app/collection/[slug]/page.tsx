@@ -25,9 +25,9 @@ export default async function CollectionPage(props: PageProps<'/collection/[slug
   const img = collection.image?.large ?? collection.image?.small ?? ''
 
   const stats = [
-    { label: 'Floor Price', value: fmtEth(collection.floor_price?.native_currency, 3), sub: fmtUsd(collection.floor_price?.usd), icon: DollarSign, chg: collection.floor_price_24h_percentage_change },
+    { label: 'Floor Price', value: fmtEth(collection.floor_price?.native_currency, 3), sub: fmtUsd(collection.floor_price?.usd), icon: DollarSign, chg: collection.floor_price_in_usd_24h_percentage_change },
     { label: 'Market Cap', value: fmtUsd(collection.market_cap?.usd), sub: fmtEth(collection.market_cap?.native_currency, 0) + ' ETH', icon: BarChart2 },
-    { label: 'Vol (24h)', value: fmtUsd(collection.volume_24h?.usd), sub: fmtEth(collection.volume_24h?.native_currency, 1) + ' ETH', icon: TrendingUp, chg: collection.volume_24h_percentage_change },
+    { label: 'Vol (24h)', value: fmtUsd(collection.volume_24h?.usd), sub: fmtEth(collection.volume_24h?.native_currency, 1) + ' ETH', icon: TrendingUp, chg: collection.volume_in_usd_24h_percentage_change },
     { label: 'Sales (24h)', value: (collection.one_day_sales ?? 0).toLocaleString(), sub: `${(collection.one_day_sales_24h_percentage_change ?? 0) > 0 ? '+' : ''}${(collection.one_day_sales_24h_percentage_change ?? 0).toFixed(1)}%`, icon: ShoppingCart },
     { label: 'Total Supply', value: (collection.total_supply ?? 0).toLocaleString(), icon: ImageIcon },
     { label: 'Owners', value: (collection.number_of_unique_addresses ?? 0).toLocaleString(), sub: `${(collection.number_of_unique_addresses_24h_percentage_change ?? 0) > 0 ? '+' : ''}${(collection.number_of_unique_addresses_24h_percentage_change ?? 0).toFixed(1)}% (24h)`, icon: Users },

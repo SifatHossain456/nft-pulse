@@ -1,6 +1,26 @@
 const CG = 'https://api.coingecko.com/api/v3'
-const ALCHEMY_BASE = 'https://eth-mainnet.g.alchemy.com/nft/v3'
-const ALCHEMY_KEY = process.env.ALCHEMY_API_KEY ?? 'demo'
+
+// Curated list of top NFT collections — all fetchable via free /nfts/{id} endpoint
+export const TOP_NFT_IDS = [
+  'bored-ape-yacht-club',
+  'cryptopunks',
+  'mutant-ape-yacht-club',
+  'azuki',
+  'pudgy-penguins',
+  'otherdeed-for-otherside',
+  'doodles-official',
+  'clone-x-x-takashi-murakami',
+  'moonbirds',
+  'lilpudgys',
+  'beanz-official',
+  'meebits',
+  'mfers',
+  'degods',
+  'okay-bears',
+  'world-of-women-nft',
+  'cool-cats-nft',
+  'sandbox',
+]
 
 export interface Collection {
   id: string
@@ -8,84 +28,68 @@ export interface Collection {
   asset_platform_id: string
   name: string
   symbol: string
-  image: { small: string; large: string; header?: string }
+  image: { small: string; large: string }
   banner_image: string
   description: string
   floor_price: { native_currency: number; usd: number }
   market_cap: { native_currency: number; usd: number }
   volume_24h: { native_currency: number; usd: number }
-  floor_price_24h_percentage_change: number
-  volume_24h_percentage_change: number
+  floor_price_in_usd_24h_percentage_change: number
+  volume_in_usd_24h_percentage_change: number
   number_of_unique_addresses: number
   number_of_unique_addresses_24h_percentage_change: number
   total_supply: number
   one_day_sales: number
   one_day_sales_24h_percentage_change: number
+  one_day_average_sale_price: { native_currency: number; usd: number }
 }
 
-export interface NFTToken {
-  token: {
-    contract: string
-    tokenId: string
-    name: string
-    image: string
-    collection: { id: string; name: string; image: string }
-    rarity: number
-    rarityRank: number
+async function fetchOne(id: string): Promise<Collection | null> {
+  try {
+    const res = await fetch(`${CG}/nfts/${id}`, {
+      next: { revalidate: 600 },
+    })
+    if (!res.ok) return null
+    return res.json()
+  } catch {
+    return null
   }
-  market: {
-    floorAsk: { price: { amount: { native: number; usd: number } } | null }
-  }
-}
-
-export interface Sale {
-  id: string
-  saleId: string
-  token: { contract: string; tokenId: string; name: string; image: string; collection: { id: string; name: string } }
-  orderSource: string
-  fillSource: string
-  timestamp: number
-  price: { amount: { native: number; usd: number } }
-  from: string
-  to: string
 }
 
 export async function getTrendingCollections(limit = 20): Promise<Collection[]> {
-  const res = await fetch(
-    `${CG}/nfts/markets?order=h24_volume_native_desc&per_page=${Math.min(limit, 50)}&page=1`,
-    { next: { revalidate: 120 } }
-  )
-  if (!res.ok) throw new Error(`CoinGecko NFT trending error ${res.status}`)
-  return res.json()
+  const ids = TOP_NFT_IDS.slice(0, Math.min(limit, TOP_NFT_IDS.length))
+  const results = await Promise.allSettled(ids.map(fetchOne))
+  return results
+    .filter((r): r is PromiseFulfilledResult<Collection> => r.status === 'fulfilled' && r.value !== null)
+    .map((r) => r.value)
+    .sort((a, b) => (b.volume_24h?.usd ?? 0) - (a.volume_24h?.usd ?? 0))
 }
 
 export async function getTopCollections(limit = 50): Promise<Collection[]> {
-  const res = await fetch(
-    `${CG}/nfts/markets?order=market_cap_usd_desc&per_page=${Math.min(limit, 50)}&page=1`,
-    { next: { revalidate: 300 } }
-  )
-  if (!res.ok) throw new Error(`CoinGecko NFT top error ${res.status}`)
-  return res.json()
+  const ids = TOP_NFT_IDS.slice(0, Math.min(limit, TOP_NFT_IDS.length))
+  const results = await Promise.allSettled(ids.map(fetchOne))
+  return results
+    .filter((r): r is PromiseFulfilledResult<Collection> => r.status === 'fulfilled' && r.value !== null)
+    .map((r) => r.value)
+    .sort((a, b) => (b.market_cap?.usd ?? 0) - (a.market_cap?.usd ?? 0))
 }
 
 export async function getCollection(id: string): Promise<Collection | null> {
-  const res = await fetch(`${CG}/nfts/${id}`, { next: { revalidate: 60 } })
-  if (!res.ok) return null
-  return res.json()
+  return fetchOne(id)
 }
 
-export async function getCollectionTokens(_collection: string, _limit = 24): Promise<NFTToken[]> {
-  return []
+export interface AlchemyNFT {
+  contract: { address: string; name: string }
+  tokenId: string
+  name: string
+  image: { cachedUrl?: string; originalUrl?: string; thumbnailUrl?: string }
+  collection?: { name?: string }
 }
 
-export async function getRecentSales(_collection?: string, _limit = 20): Promise<Sale[]> {
-  return []
-}
-
-export async function getWalletNFTs(address: string, _limit = 48): Promise<AlchemyNFT[]> {
+export async function getWalletNFTs(address: string): Promise<AlchemyNFT[]> {
   try {
     const res = await fetch(
-      `${ALCHEMY_BASE}/${ALCHEMY_KEY}/getNFTsForOwner?owner=${address}&withMetadata=true&pageSize=48`,
+      `https://eth-mainnet.g.alchemy.com/nft/v3/demo/getNFTsForOwner?owner=${address}&withMetadata=true&pageSize=48`,
       { cache: 'no-store' }
     )
     if (!res.ok) return []
@@ -94,18 +98,6 @@ export async function getWalletNFTs(address: string, _limit = 48): Promise<Alche
   } catch {
     return []
   }
-}
-
-export interface AlchemyNFT {
-  contract: { address: string; name: string; openSeaMetadata?: { imageUrl?: string } }
-  tokenId: string
-  name: string
-  image: { cachedUrl?: string; originalUrl?: string; thumbnailUrl?: string }
-  collection?: { name?: string; slug?: string }
-}
-
-export async function getCollectionActivity(_collection: string, _limit = 20) {
-  return []
 }
 
 export function fmtEth(n: number | undefined | null, decimals = 3): string {
@@ -119,14 +111,6 @@ export function fmtUsd(n: number | undefined | null): string {
   if (n >= 1e6) return `$${(n / 1e6).toFixed(2)}M`
   if (n >= 1e3) return `$${(n / 1e3).toFixed(1)}K`
   return `$${n.toFixed(2)}`
-}
-
-export function timeAgo(ts: number): string {
-  const diff = Date.now() / 1000 - ts
-  if (diff < 60) return `${Math.floor(diff)}s ago`
-  if (diff < 3600) return `${Math.floor(diff / 60)}m ago`
-  if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`
-  return `${Math.floor(diff / 86400)}d ago`
 }
 
 export function shortAddr(addr: string): string {

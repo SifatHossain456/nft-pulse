@@ -78,8 +78,8 @@ async function HeroCard({ col }: { col: Collection }) {
   const banner = col.banner_image ?? col.image?.large ?? col.image?.small ?? ''
   const img = col.image?.small ?? ''
   return (
-    <Link href={`/collection/${col.id}`}>
-      <div className="relative rounded-2xl overflow-hidden border border-[#1e1e1e] hover:border-[#a855f7]/40 transition-all group cursor-pointer mb-3">
+    <Link href={`/collection/${col.id}`} aria-label={`${col.name} — #1 Trending collection`}>
+      <div className="relative rounded-2xl overflow-hidden border border-[#1e1e1e] hover:border-[#a855f7]/40 transition-all group mb-3">
         <div
           className="h-52 bg-cover bg-center bg-[#1a1a1a]"
           style={banner ? { backgroundImage: `url(${banner})` } : undefined}

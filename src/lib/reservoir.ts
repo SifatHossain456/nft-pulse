@@ -87,9 +87,10 @@ export interface AlchemyNFT {
 }
 
 export async function getWalletNFTs(address: string): Promise<AlchemyNFT[]> {
+  const apiKey = process.env.ALCHEMY_API_KEY ?? 'demo'
   try {
     const res = await fetch(
-      `https://eth-mainnet.g.alchemy.com/nft/v3/demo/getNFTsForOwner?owner=${address}&withMetadata=true&pageSize=48`,
+      `https://eth-mainnet.g.alchemy.com/nft/v3/${apiKey}/getNFTsForOwner?owner=${address}&withMetadata=true&pageSize=48`,
       { cache: 'no-store' }
     )
     if (!res.ok) return []

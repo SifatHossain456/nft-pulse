@@ -1,5 +1,11 @@
 export const dynamic = 'force-dynamic'
 
+import type { Metadata } from 'next'
+export const metadata: Metadata = {
+  title: 'Top Collections',
+  description: 'Top 50 NFT collections ranked by market cap — live floor prices, 24h volume, and owner counts.',
+}
+
 import { getTopCollections, fmtEth, fmtUsd, type Collection } from '@/lib/reservoir'
 import { TrendingUp, TrendingDown } from 'lucide-react'
 import Link from 'next/link'

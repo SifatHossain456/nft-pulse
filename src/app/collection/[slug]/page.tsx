@@ -1,8 +1,21 @@
 export const dynamic = 'force-dynamic'
 
+import type { Metadata } from 'next'
 import { getCollection, fmtEth, fmtUsd, type Collection } from '@/lib/reservoir'
 import { notFound } from 'next/navigation'
 import { TrendingUp, TrendingDown, ExternalLink, Users, ImageIcon, DollarSign, BarChart2, ShoppingCart } from 'lucide-react'
+
+export async function generateMetadata(props: PageProps<'/collection/[slug]'>): Promise<Metadata> {
+  const { slug } = await props.params
+  const collection = await getCollection(slug)
+  if (!collection) return { title: 'Collection Not Found' }
+  return {
+    title: collection.name,
+    description: collection.description
+      ? collection.description.replace(/<[^>]+>/g, '').slice(0, 160)
+      : `${collection.name} NFT collection — floor price, volume, and market data.`,
+  }
+}
 
 function Chg({ v }: { v: number | undefined }) {
   const val = v ?? 0

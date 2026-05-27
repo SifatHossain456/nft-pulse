@@ -82,6 +82,7 @@ export default async function ActivityPage() {
                     <a
                       href={`https://opensea.io/collection/${col.id}`}
                       target="_blank" rel="noopener noreferrer"
+                      aria-label={`View ${col.name} on OpenSea`}
                       className="text-[#71717a] hover:text-[#a855f7] transition-colors"
                     >
                       <ExternalLink className="w-3.5 h-3.5 inline" />
